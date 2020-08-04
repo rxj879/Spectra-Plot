@@ -129,10 +129,7 @@ class GenPlotOptions(wx.Frame):
         self.FullSpectrumGroup.__dict__[AxisTitleDict] = NewSeriesLabel
         self.OnRadioBox_NormChoices( event )
         
-    def SetSpinnorGenPlotValueOnOpen (self, NumDSN):
-        """Generic function for setting a spin control widget value"""
-        Value = self.FullSpectrumGroup.__dict__[NumDSN]
-        self.__dict__['m_SpinCtrl_' + NumDSN].SetValue(Value)
+
         
     def OnSpinCtrl_Num_X_MinorTicks (self, event):
         """Spin control setting the number of minor x axis ticks"""
@@ -209,15 +206,11 @@ class GenPlotOptions(wx.Frame):
     def On_CHKBox_OverrideXAxisOption (self, event):
         """Check box for overriding the x axis default settings"""
         self.CHKBox_ForwardTruthApply('OverrideXAxisOption')
-        self.OnSpinCtrl_X_Axis_LowLim(event)
-        self.OnSpinCtrl_X_Axis_HiLim(event)
         self.OnRadioBox_NormChoices( event )
         
     def On_CHKBox_OverrideYAxisOption (self, event):
         """Check boc for overriding the y axis default settings"""
         self.CHKBox_ForwardTruthApply('OverrideYAxisOption')
-        self.OnSpinCtrl_Y_Axis_LowLim(event)
-        self.OnSpinCtrl_Y_Axis_HiLim(event)
         self.OnRadioBox_NormChoices( event )
         
     def On_CHKBox_sharexOption(self, event):
@@ -259,6 +252,11 @@ class GenPlotOptions(wx.Frame):
         """Check box for turning on and off the box plot frame option"""
         self.CHKBox_InverseTruthApply('BoxPlotOption')
         self.OnRadioBox_NormChoices( event )  
+        
+    def SetSpinnorGenPlotValueOnOpen (self, NumDSN):
+        """Generic function for setting a spin control widget value"""
+        Value = self.FullSpectrumGroup.__dict__[NumDSN]
+        self.__dict__['m_SpinCtrl_' + NumDSN].SetValue(Value)
         
     def GenPlotOption_InverseTruthSet(self, Option):
         """Generic function for applying inverse truth"""

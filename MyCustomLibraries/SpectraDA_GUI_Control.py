@@ -257,6 +257,7 @@ class MainFrame(gui.MainFrame, export_gui.ExportFrame, gplot_gui.GenPlotOptions,
             self.PopulateListSpectra()
             self.m_ListCtrl_Spectra.Select(Series+1)
             
+    
 ####################################################################### - CROP SPECTRA
             
     def OnButtonClick_TruncateSpectra( self, event ):

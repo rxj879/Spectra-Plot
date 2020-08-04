@@ -124,8 +124,8 @@ class DataClass_Spectra:
         self.YAxisTickLabelsOption = True
         self.YAxisExponentialOption = False
         self.YAxisTicksOption = False
-        self.MajorXgridlinesOption = True
-        self.MinorXgridlinesOption = True
+        self.MajorXgridlinesOption = False
+        self.MinorXgridlinesOption = False
         self.MajorYgridlinesOption = False
         self.MinorYgridlinesOption = False
         
