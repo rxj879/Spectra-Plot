@@ -215,14 +215,14 @@ class GenPlotOptions ( wx.Frame ):
                        
         self.m_SpinCtrl_Y_Axis_LowLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
                                                      size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
-                                                     min=-100000, max=100000, initial=0, inc=100, name="y axis lower limit")
+                                                     min=-100000, max=1E30, initial=0, inc=100, name="y axis lower limit")
 
         self.m_staticText_Y_Axis_HiLim = wx.StaticText( self, wx.ID_ANY, u"y high limit", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Y_Axis_HiLim.Wrap( -1 )
                        
         self.m_SpinCtrl_Y_Axis_HiLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
                                                      size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
-                                                     min=-100000, max=100000, initial=0, inc=100, name="y axis higher limit")
+                                                     min=-100000, max=1E30, initial=0, inc=100, name="y axis higher limit")
 
         self.m_staticText_Num_Y_Ticks = wx.StaticText( self, wx.ID_ANY, u"Number of y ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Num_Y_Ticks.Wrap( -1 )
