@@ -45,6 +45,9 @@ class GenPlotOptions(wx.Frame):
         self.GenPlotOption_ForwardTruthSet('MajorYgridlinesOption')
         self.GenPlotOption_ForwardTruthSet('MinorXgridlinesOption')
         self.GenPlotOption_ForwardTruthSet('MinorYgridlinesOption')
+        self.SetSpinnorGenPlotValueOnOpen ('Plotlinewidth')
+        self.SetSpinnorGenPlotValueOnOpen ('MajorGridlinewidth')
+        self.SetSpinnorGenPlotValueOnOpen ('MinorGridlinewidth')
         self.SetSpinnorGenPlotValueOnOpen ('PlotTextSize')
         self.SetSpinnorGenPlotValueOnOpen ('Num_X_MinorTicks')
         self.SetSpinnorGenPlotValueOnOpen ('Num_X_Ticks')
@@ -68,6 +71,18 @@ class GenPlotOptions(wx.Frame):
         self.m_ComboBox_MinorGridColour.SetSelection(GridColourList.index(self.FullSpectrumGroup.MinorGridColour))
         Leg_PosList = Legend_PositionOptionsArray()
         self.m_ComboBox_Legend_loc.SetSelection(Leg_PosList.index(self.FullSpectrumGroup.Legend_loc))
+
+    def OnSpinCtrl_MajorGridlinewidth(self, event):
+        """Change the line width of the spectra"""
+        self.ChangeNumericGeneralPlotOption ( event, 'MajorGridlinewidth')
+
+    def OnSpinCtrl_MinorGridlinewidth(self, event):
+        """Change the line width of the spectra"""
+        self.ChangeNumericGeneralPlotOption ( event, 'MinorGridlinewidth')
+        
+    def OnSpinCtrl_Plotlinewidth(self, event):
+        """Change the line width of the spectra"""
+        self.ChangeNumericGeneralPlotOption ( event, 'Plotlinewidth')
         
     def OnComboBoxSelect_Legend_loc(self, event):
         """Drop down box for the legend location presets"""

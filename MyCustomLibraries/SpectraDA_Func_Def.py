@@ -16,6 +16,9 @@ from tkinter import filedialog
 from tkinter import Tk
 # Import ask save / open file and directory dialogue box library
 
+import os
+# Import os library for removing files
+
 from pathlib import Path
 # import the library for handling windows paths
 
@@ -38,7 +41,7 @@ def PickleResortDataDICT(Dict_Index):
     1 : 'Raman_Shift',
     2 : 'Raman_Intensity',
     3 : 'Vec_Norm_Intensity',
-    4 : 'Intensity_Norm_Intensity',
+    4 : 'std_var_Norm_Intensity',
     5 : 'Zero_to_One_Intensity',
     6 : 'Series_FileName'
     }
@@ -98,7 +101,7 @@ def Radio2NormOption_Y_Variable(argument):
     switcher = {
     0: 'Raman_Intensity',
     1: 'Vec_Norm_Intensity',
-    2: 'Intensity_Norm_Intensity',
+    2: 'std_var_Norm_Intensity',
     3: 'Zero_to_One_Intensity'
     }
     return switcher.get(argument, 'k-')
@@ -245,62 +248,59 @@ def LineColourArray():
     """Line colour options array"""
     Colour = [
         'Black',
-        'Red',
-        'Green',
-        'Blue',
         'dimgrey',
+        'darkgrey',
         'silver',
         'lightgrey',
-        'firebrick',
+
         'maroon',
+        'darkred',
+        'firebrick',
+        'red',
         'orangered',
-        'saddlebrown',
-        'peru',
         'darkorange',
+        'orange',
+        
+        'saddlebrown',
         'darkgoldenrod',
         'goldenrod',
         'gold',
-        'olive',
-        'olivedrab',
+
         'darkolivegreen',
-        'lawngreen',
-        'palegreen',
-        'forestgreen',
+        'olivedrab',
+        'olive',
+        'y',
+        'darkkhaki',
+        'khaki',
+        
         'darkgreen',
+        'Green',
+        'limegreen',
         'lime',
-        'springgreen',
-        'turquoise',
-        'lightseagreen',
-        'teal',
-        'cyan',
-        'deepskyblue',
-        'steelblue',
-        'dodgerblue',
-        'cornflowerblue',
-        'royalblue',
+        'mediumspringgreen',
+        'palegreen',
+        'greenyellow',
+        
+        'midnightblue',
         'navy',
+        'darkblue',
         'mediumblue',
+        'blue',
         'slateblue',
-        'darkslateblue',
-        'mediumslateblue',
-        'mediumpurple',
-        'rebeccapurple',
-        'blueviolet',
+        
         'indigo',
-        'darkorchid',
-        'darkviolet',
-        'mediumorchid',
-        'plum',
-        'violet',
         'purple',
         'darkmagenta',
-        'fuchsia',
-        'magenta',
+        'darkorchid',
+        'mediumorchid',
         'orchid',
-        'mediumvioletred',
+        'plum',
+        
+        'crimson',
         'deeppink',
+        'magenta',
         'hotpink',
-        'crimson'  ]
+        'pink'   ]
     return Colour
 
 def swap(list, n, m):
@@ -360,11 +360,18 @@ def vec_norm (Spectrum):
         norm = 1;
     return norm
 
-def intensity_norm (Spectrum):
+def std_var_mean (Spectrum):
+    """Compute mean for standard normal variate"""
+    mean = sum(Spectrum)/len(Spectrum)
+    
+    return mean
+
+def std_var_norm (Spectrum , mean):
     """Compute normalisation coefficient for intensity normalisation"""
     norm=0
     for i in range(len(Spectrum)):
-        norm = norm + Spectrum[i]; 
+        norm = norm + pow((Spectrum[i]-mean),2); 
+    norm = pow(norm, 0.5)/(len(Spectrum)-1)
     if norm == 0:
         norm = 1;
     return norm
@@ -373,3 +380,25 @@ def TakeValuesBetweenTwoLimits(Array, LowerLimit, UperLimit):
     """Create a truth array for values in a list which lie between two values"""
     Truthindex = (Array>LowerLimit) & (Array<UperLimit)
     return Array[Truthindex], Truthindex
+
+def Create_Directory(dirName):
+    """Check and create a directory"""
+    try:
+        # Create target Directory
+        os.mkdir(dirName)
+        
+    except FileExistsError:
+        pass     
+    
+    if not os.path.exists(dirName):
+        os.mkdir(dirName)
+
+    else:    
+        pass
+
+def GenerateTwoColumnData(Column1, Column2):
+    
+    Data = []
+    for i in range(len(Column1)):
+        Data.append([Column1[i], Column2[i]])
+    return Data

@@ -51,13 +51,15 @@ class ExportFrame ( wx.Frame ):
         FormatList = ExportFormatList()
         self.m_ComboBox_Format = wx.ComboBox(self, wx.ID_ANY, "Format", wx.DefaultPosition,
                                              (100,-1), FormatList, 1)
-
+        self.m_ComboBox_Format.SetSelection(0)
+        
         self.m_staticText_Resolution = wx.StaticText( self, wx.ID_ANY, u"Export Resolution", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Resolution.Wrap( -1 )
         
         ResolutionList = ExportResolutionList()
         self.m_ComboBox_Resolution = wx.ComboBox(self, wx.ID_ANY, "Resolution", wx.DefaultPosition,
                                              (100,-1), ResolutionList , 0)
+        self.m_ComboBox_Resolution.SetSelection(3)
         
         self.m_staticline1 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         

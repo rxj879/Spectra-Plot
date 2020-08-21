@@ -18,9 +18,7 @@ import wx
 import MyCustomLibraries.Export_GUI as export_gui
 # Import the export gui frame design
 
-from MyCustomLibraries.SpectraDA_Func_Def import (Save_File, 
-                                                  path_leaf)
-# Import the custom functions required
+
 
 class ExportFrame(wx.Frame):
     """Member functions for the export frame gui"""
@@ -37,15 +35,14 @@ class ExportFrame(wx.Frame):
         n = self.m_ComboBox_Resolution.GetCurrentSelection()
         Resolution = int(self.m_ComboBox_Resolution.GetString(n))
         Initital_directory = self.m_textCtrl_DIR.GetValue()# I want to remove this
-        SaveFileName_Head_Tail = Save_File (Initital_directory)
-        SaveFileName_NameOnly = path_leaf(SaveFileName_Head_Tail)
-        SaveFileName = Initital_directory + '/' + SaveFileName_NameOnly + '.' + Format
+
+        SaveFileName = Initital_directory + '/' + 'Plot' + '.' + Format
         print('SaveFileName :', SaveFileName)
         self.FullSpectrumGroup.fig.savefig( SaveFileName , 
                                                dpi=Resolution, 
                                                format = Format,
                                                bbox_inches='tight')
-            
+        self.FullSpectrumGroup.SaveTextData_NormOption(self.Y_Variable)
         self.FullSpectrumGroup.save_General_prefs()
         self.FullSpectrumGroup.save_Spectra_prefs()
         print('Export Complete')

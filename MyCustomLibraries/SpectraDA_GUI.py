@@ -134,22 +134,24 @@ class MainFrame ( wx.Frame ):
                                                   size=wx.DefaultSize, style=0, validator=wx.DefaultValidator,
                                                   name='Include Selected Series in Inset')
         
+
+        
         """Add widgets to the box and grid definitions"""
         bSizer31.Add(self.m_button_Move_UP, 1, wx.EXPAND, 5 )
         bSizer31.Add(self.m_button_Move_DOWN, 1, wx.EXPAND, 5 )
-        gSizer30.Add(bSizer31, 1, wx.ALL, 5 )
+        gSizer30.Add(bSizer31, 1, wx.EXPAND,5 )
         bSizer32.Add(self.m_ComboBox_Colour, 1, wx.EXPAND, 5 )
         bSizer32.Add(self.m_ComboBox_LineSty, 1, wx.EXPAND, 5 )
-        gSizer30.Add(bSizer32, 1, wx.ALL, 5 )
-        bSizer33.Add(self.m_StaticText_LabelEntry, 0, wx.EXPAND, 5 )
-        bSizer33.Add(self.m_textCtrl_SeriesLabel, 0, wx.EXPAND, 5 )
+        gSizer30.Add(bSizer32, 1, wx.EXPAND, 5 )
+        bSizer33.Add(self.m_StaticText_LabelEntry, 1, wx.EXPAND, 5 )
+        bSizer33.Add(self.m_textCtrl_SeriesLabel, 1, wx.EXPAND, 5 )
         gSizer30.Add(bSizer33, 1, wx.EXPAND, 5 )
-        bSizer34.Add(self.m_button_MoveLabel, 0, wx.EXPAND, 5 )
-        gSizer30.Add(bSizer34, 10, wx.ALL, 10 )
-        bSizer35.Add(self.m_button_TruncateSpectra, 0, wx.EXPAND, 5 )
-        gSizer30.Add(bSizer35, 10, wx.ALL, 10 )
-        bSizer36.Add(self.m_CHKBox_IncludeSelectedSpectrum, 0, wx.ALL, 5)
-        bSizer36.Add(self.m_CHKBox_IncludeSelectedSpectrum_INSET, 0, wx.ALL, 5)
+        bSizer34.Add(self.m_button_MoveLabel, 1, wx.ALL, 5 )
+        gSizer30.Add(bSizer34, 1, wx.EXPAND, 5 )
+        bSizer35.Add(self.m_button_TruncateSpectra, 1, wx.EXPAND, 5 )
+        gSizer30.Add(bSizer35, 1, wx.EXPAND, 5 )
+        bSizer36.Add(self.m_CHKBox_IncludeSelectedSpectrum, 0, wx.EXPAND, 5)
+        bSizer36.Add(self.m_CHKBox_IncludeSelectedSpectrum_INSET, 0, wx.EXPAND, 5)
         gSizer30.Add(bSizer36, 1, wx.ALL, 5 )
         bSizer30.Add( gSizer30, 1, wx.EXPAND, 5 )
 
@@ -162,7 +164,7 @@ class MainFrame ( wx.Frame ):
         
 ################################################################        
         """wx widget definitions"""
-        m_radioBox_NormChoices = [ u"None" , u"Vector Normalisation", u"Intensity Normaisation", u"Zero-to-One Normalisation" ]
+        m_radioBox_NormChoices = [ u"None" , u"Vector Normalisation", u"Standard Normal Variate", u"Zero-to-One Normalisation" ]
         
         self.m_radioBox_Norm = wx.RadioBox( self, wx.ID_ANY, u"Normalisation Option", wx.DefaultPosition, wx.DefaultSize, m_radioBox_NormChoices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox_Norm.SetSelection( 0 )
