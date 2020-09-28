@@ -32,7 +32,8 @@ from MyCustomLibraries.SpectraDA_Func_Def import  (LineStyle,
                                                    LineColour, 
                                                    swap, 
                                                    vec_norm, 
-                                                   intensity_norm, 
+                                                   std_var_norm,
+                                                   std_var_mean, 
                                                    ComputeLabelX, 
                                                    ComputeLabelY,
                                                    format_exponent,
@@ -42,7 +43,9 @@ from MyCustomLibraries.SpectraDA_Func_Def import  (LineStyle,
                                                    FindMin,
                                                    FuncInsetLineColour,
                                                    PickleResortDataDICT,
-                                                   Compute_Scaled_Move)
+                                                   Compute_Scaled_Move,
+                                                   Create_Directory,
+                                                   GenerateTwoColumnData)
 # Import custom functions required
 
 class DataClass_Spectra:
@@ -55,7 +58,7 @@ class DataClass_Spectra:
         self.Raman_Shift = []
         self.Raman_Intensity = []
         self.Vec_Norm_Intensity = []
-        self.Intensity_Norm_Intensity = []
+        self.std_var_Norm_Intensity = []
         self.Zero_to_One_Intensity = []
 
         self.Series_FileName = []
@@ -134,6 +137,9 @@ class DataClass_Spectra:
         
         self.PlotTextSize = 10
         self.LabelsFontSize = 8
+        self.Plotlinewidth = 0.5
+        self.MinorGridlinewidth = 0.3
+        self.MajorGridlinewidth = 0.4
         self.Y_AxisTitle = 'Intensity (arb. units)'
         self.X_AxisTitle = 'Raman shift (cm$^{-1}$)'
         self.Legend_loc= 'upper left' 
@@ -142,9 +148,14 @@ class DataClass_Spectra:
         self.Y_axis_Title_Pad = 5.0
         self.X_axis_Title_Pad = 5.0
         
+        self.Norm_RadioBoxOption = 0
+        self.Plot_RadioBoxOption = 0
+
         """MultiPlot Options"""
         self.MultiPlot_shareyOption = False
         self.MultiPlot_sharexOption = True
+        
+
 
 #########################
         """Here are the inset plot style options to add to the GUI"""        
@@ -175,7 +186,12 @@ class DataClass_Spectra:
         """Save general plot preferences"""
         print("Saving general preferences...")
         File = self.Directory+"\General_prefs.pickle"
-        pickle.dump([self.OverrideXAxisOption,
+        pickle.dump([self.Plotlinewidth,
+                     self.MinorGridlinewidth,
+                     self.MajorGridlinewidth,
+                     self.Norm_RadioBoxOption,
+                     self.Plot_RadioBoxOption,
+                     self.OverrideXAxisOption,
                      self.OverrideYAxisOption,
                      self.X_Axis_LowLim,
                      self.X_Axis_HiLim,
@@ -242,7 +258,12 @@ class DataClass_Spectra:
         """Load general plot preferences"""
         print("Loading preferences...")
         File = self.Directory+"\General_prefs.pickle"
-        (self.OverrideXAxisOption,
+        (self.Plotlinewidth,
+         self.MinorGridlinewidth,
+         self.MajorGridlinewidth,
+         self.Norm_RadioBoxOption,
+         self.Plot_RadioBoxOption,
+         self.OverrideXAxisOption,
          self.OverrideYAxisOption,
          self.X_Axis_LowLim,
          self.X_Axis_HiLim,
@@ -371,10 +392,17 @@ class DataClass_Spectra:
     
     def Sort_Arrays_PostPickleLoad(self):
         """Sort the spectra according to loaded sort order"""
-        for i in range(0, 7):
-            if len(self.__dict__[PickleResortDataDICT(i)])!=0:
-                Temp_Sorted_Data = [self.__dict__[PickleResortDataDICT(i)][j] for j in self.Series_order]
-                self.__dict__[PickleResortDataDICT(i)] = Temp_Sorted_Data
+
+        if self.SeriesResorted_Order != self.Series_order:
+            
+            for i in range(0, 7):
+                if len(self.__dict__[PickleResortDataDICT(i)])!=0:
+                    print(PickleResortDataDICT(i))
+                    Temp_Sorted_Data = [self.__dict__[PickleResortDataDICT(i)][j] for j in self.Series_order]
+                    
+                    Temp_SortedSortOrder = [x for _, x in sorted(zip(self.Series_order,self.SeriesResorted_Order))]
+                    self.SeriesResorted_Order = Temp_SortedSortOrder
+                    self.__dict__[PickleResortDataDICT(i)] = Temp_Sorted_Data
 
     def ChangeInsetSize_Pos(self, Dimension, Value):
         """Change inset size and position"""
@@ -391,7 +419,11 @@ class DataClass_Spectra:
         os.chdir(Text_Data_Directory)
         self.NumOfSpectra = np.size(glob.glob("*.txt"))
         self.Series_order = list(range(0,self.NumOfSpectra))
+        
         i=1
+        
+        if len(self.Data) == 0:
+            self.SeriesResorted_Order = self.Series_order
         
         for file in glob.glob("*.txt"):
             Data=np.genfromtxt(file); # , delimiter = '\t'
@@ -424,15 +456,18 @@ class DataClass_Spectra:
         self.CheckandLoad_Spectra_Prefs()
         self.Sort_Arrays_PostPickleLoad()
 
+
     def Plot_Spectra(self, Y_Variable):
         """Plot standard spectra plot"""
-        plt.rcParams.update({'font.size': self.PlotTextSize})     
+        plt.rcParams.update({'font.size': self.PlotTextSize})  
+        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
         self.fig , ax = plt.subplots(figsize = (self.FigWidth,self.FigHeight), dpi = 300)
 
         for i in range(self.NumOfSpectra):
             if self.IncludeSelectedSpectrum[i]:
                 plt.plot(self.Raman_Shift[i], self.__dict__[Y_Variable][i], 
-                         color = self.Series_Colour[i], linestyle= self.Series_LineSty[i] ,linewidth=1)
+                         color = self.Series_Colour[i], linestyle= self.Series_LineSty[i] ,
+                         linewidth=self.Plotlinewidth)
         
         if self.ShowLegendOption:
             self.Add_TheLegend_ToPosition()
@@ -449,13 +484,15 @@ class DataClass_Spectra:
     def Plot_OFFSET_Spectra(self, Y_Variable):
         """Plot spectra offset from one another"""
         plt.rcParams.update({'font.size': self.PlotTextSize})  
+        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
         self.fig , ax = plt.subplots(figsize = (self.FigWidth,self.FigHeight), dpi = 300)
         Offset =  0.0;
         
         for i in range(self.NumOfSpectra):
             if self.IncludeSelectedSpectrum[i]:
                 plt.plot(self.Raman_Shift[i], self.__dict__[Y_Variable][i] + Offset , 
-                         color = self.Series_Colour[i], linestyle= self.Series_LineSty[i], linewidth=1)
+                         color = self.Series_Colour[i], linestyle= self.Series_LineSty[i], 
+                         linewidth=self.Plotlinewidth)
                 Offset = self.AddSeriesLabel_ReturnNewOffset( i, Y_Variable, 
                                                              Offset, AddLabel=self.ShowLegendOption)
         
@@ -471,6 +508,7 @@ class DataClass_Spectra:
     def SUB_Plot_Spectra(self, Y_Variable):
         """Plot spectra in a multi sub plot"""
         plt.rcParams.update({'font.size': self.PlotTextSize})  
+        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
         NumOfSpectra = sum(self.IncludeSelectedSpectrum)
         self.fig, ax = plt.subplots(nrows=NumOfSpectra, ncols=1,
                                     figsize = (self.FigWidth,self.FigHeight), dpi = 300)
@@ -482,7 +520,8 @@ class DataClass_Spectra:
         sub_Plot_Num = self.ReturnSubPlotNum(0)
         ax1 = plt.subplot(sub_Plot_Num)
         plt.plot(Raman_Shift_toShow[0], Intensity_Y_Var_toShow[0], 
-                 color = line_Col_toShow[0], linestyle= line_Sty_toShow[0], linewidth=1)
+                 color = line_Col_toShow[0], linestyle= line_Sty_toShow[0], 
+                 linewidth=self.Plotlinewidth)
         n_th = [y for y in enumerate(BoolList) if y[1]==True][0][0]
         self.AddSeriesLabel_ReturnNewOffset( n_th , Y_Variable, 0, AddLabel=self.ShowLegendOption)
         plt.xlabel(self.X_AxisTitle, fontsize=int(self.PlotTextSize *1.5), 
@@ -496,7 +535,8 @@ class DataClass_Spectra:
                                   self.MultiPlot_shareyOption, 
                                   sub_Plot_Num , ax1)
             plt.plot(Raman_Shift_toShow[i], Intensity_Y_Var_toShow[i],
-                     color = line_Col_toShow[i], linestyle= line_Sty_toShow[i], linewidth=1)
+                     color = line_Col_toShow[i], linestyle= line_Sty_toShow[i], 
+                     linewidth=self.Plotlinewidth)
             n_th = [y for y in enumerate(BoolList) if y[1]==True][i][0]
             self.AddSeriesLabel_ReturnNewOffset( n_th, Y_Variable, 0, AddLabel=self.ShowLegendOption)
             
@@ -577,22 +617,26 @@ class DataClass_Spectra:
         if self.MajorXgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MajorGridColour)
             plt.grid(b=self.MajorXgridlinesOption, 
-                        which='major', axis='x', color=grid_Colour, linestyle='--', linewidth=0.8)
+                        which='major', axis='x', color=grid_Colour, linestyle='--', 
+                        linewidth=self.MajorGridlinewidth)
             
         if self.MajorYgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MajorGridColour)
             plt.grid(b=self.MajorYgridlinesOption, 
-                        which='major', axis='y', color=grid_Colour, linestyle='--', linewidth=0.8)
+                        which='major', axis='y', color=grid_Colour, linestyle='--', 
+                        linewidth=self.MajorGridlinewidth)
         
         if self.MinorXgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MinorGridColour)
             plt.grid(b=self.MinorXgridlinesOption, 
-                        which='minor', axis='x', color=grid_Colour, linestyle='--', linewidth= 0.6 )
+                        which='minor', axis='x', color=grid_Colour, linestyle='--',
+                        linewidth= self.MinorGridlinewidth )
         
         if self.MinorYgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MinorGridColour)
             plt.grid(b=self.MinorYgridlinesOption, 
-                        which='minor', axis='y', color=grid_Colour, linestyle='--', linewidth= 0.6 )
+                        which='minor', axis='y', color=grid_Colour, linestyle='--', 
+                        linewidth= self.MinorGridlinewidth )
         
         if self.InsetLabelBackgroundWhite:
             ax_inset.set_xticklabels(ax_inset.get_xticks(), backgroundcolor='w')
@@ -664,22 +708,26 @@ class DataClass_Spectra:
         if self.MajorXgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MajorGridColour)
             plt.grid(b=self.MajorXgridlinesOption, 
-                        which='major', axis='x', color=grid_Colour, linestyle='--', linewidth=0.8)
+                        which='major', axis='x', color=grid_Colour, linestyle='--', 
+                        linewidth=self.MajorGridlinewidth)
             
         if self.MajorYgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MajorGridColour)
             plt.grid(b=self.MajorYgridlinesOption, 
-                        which='major', axis='y', color=grid_Colour, linestyle='--', linewidth=0.8)
+                        which='major', axis='y', color=grid_Colour, linestyle='--', 
+                        linewidth=self.MajorGridlinewidth)
         
         if self.MinorXgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MinorGridColour)
             plt.grid(b=self.MinorXgridlinesOption, 
-                        which='minor', axis='x', color=grid_Colour, linestyle='--', linewidth= 0.6 )
+                        which='minor', axis='x', color=grid_Colour, linestyle='--', 
+                        linewidth= self.MinorGridlinewidth )
         
         if self.MinorYgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MinorGridColour)
             plt.grid(b=self.MinorYgridlinesOption, 
-                        which='minor', axis='y', color=grid_Colour, linestyle='--', linewidth= 0.6 )
+                        which='minor', axis='y', color=grid_Colour, linestyle='--', 
+                        linewidth= self.MinorGridlinewidth )
         
         if self.OverrideXAxisOption == False: 
             self.X_Axis_LowLim = self.X_Axis_LowLim_Override
@@ -811,8 +859,8 @@ class DataClass_Spectra:
         elif Y_Variable == 'Vec_Norm_Intensity':
             self.Vector_Norm()
 
-        elif Y_Variable == 'Intensity_Norm_Intensity':
-            self.Intensity_Norm()
+        elif Y_Variable == 'std_var_Norm_Intensity':
+            self.std_var_Norm()
 
         elif Y_Variable ==  'Zero_to_One_Intensity':
             self.Zero_to_One_Norm()
@@ -832,13 +880,14 @@ class DataClass_Spectra:
             self.Vec_Norm_Intensity.append(self.Raman_Intensity[i]/norm)
             self.Series_Label_Y[i] = ComputeLabelY(self.Vec_Norm_Intensity[i])
 
-    def Intensity_Norm(self):
+    def std_var_Norm(self):
         """Intensity normalisation"""
-        self.Intensity_Norm_Intensity=[]
+        self.std_var_Norm_Intensity=[]
         for i in range(self.NumOfSpectra):
-            norm = intensity_norm(self.Raman_Intensity[i])
-            self.Intensity_Norm_Intensity.append(self.Raman_Intensity[i]/norm)
-            self.Series_Label_Y[i] = ComputeLabelY(self.Intensity_Norm_Intensity[i])
+            mean = std_var_mean(self.Raman_Intensity[i])
+            norm = std_var_norm(self.Raman_Intensity[i], mean)
+            self.std_var_Norm_Intensity.append((self.Raman_Intensity[i]-mean)/norm)
+            self.Series_Label_Y[i] = ComputeLabelY(self.std_var_Norm_Intensity[i])
 
     def Zero_to_One_Norm(self):
         """Normalise zero to one"""
@@ -868,4 +917,19 @@ class DataClass_Spectra:
             if (n != self.NumOfSpectra  and type(self.__dict__[members[i]]) is list 
                 and len(self.__dict__[members[i]]) != 0 and members[i] != 'InsetLineJoin'):
                 self.__dict__[members[i]] = swap(self.__dict__[members[i]],n,n+1)
-         
+    
+    def SaveTextData_NormOption(self, Y_Variable):
+        """Write the data to new files for the importing into the Spectra Plot program"""
+        NormOption_File_Path = self.Directory + "/" + Y_Variable
+        Create_Directory(NormOption_File_Path)
+
+        
+        HEAD = '#Wave\t\t#' + Y_Variable
+        
+        for i in range(0,self.NumOfSpectra):
+            Data = GenerateTwoColumnData(self.Raman_Shift[i], self.__dict__[Y_Variable][i])
+
+            NormOption_File_i = NormOption_File_Path + "/"  + self.Series_FileName[i] + '.txt'
+            np.savetxt(NormOption_File_i, Data,  fmt='%10.3f',
+                       delimiter='\t', newline='\n', comments='',
+                       header=HEAD, encoding=None)
