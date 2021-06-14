@@ -64,6 +64,7 @@ class DataClass_Spectra:
         self.Series_FileName = []
         self.Series_Label = []
         self.Series_order =[]
+        self.Series_sorted_test = []
         
         self.Series_Colour = []
         self.Series_LineSty = []
@@ -181,11 +182,15 @@ class DataClass_Spectra:
         self.YInsetAxisTickLabelsOption = True
         self.YInsetAxisExponentialOption = True
         self.Y_insetaxis_Label_Pad = 0.0
+        
+    def reset(self):
+        self.__init__()
 
     def save_General_prefs(self):
         """Save general plot preferences"""
         print("Saving general preferences...")
         File = self.Directory+"\General_prefs.pickle"
+        F = open(File, "wb")
         pickle.dump([self.Plotlinewidth,
                      self.MinorGridlinewidth,
                      self.MajorGridlinewidth,
@@ -250,14 +255,15 @@ class DataClass_Spectra:
                      self.InsetLineJoin ,
                      self.YInsetAxisTickLabelsOption ,
                      self.YInsetAxisExponentialOption,
-                     self.Y_insetaxis_Label_Pad ], open(File, "wb"))
-
+                     self.Y_insetaxis_Label_Pad ],F)
+        F.close()
         print("General preferences saved.")
 
     def load_General_prefs(self):
         """Load general plot preferences"""
         print("Loading preferences...")
         File = self.Directory+"\General_prefs.pickle"
+        F= open(File, "rb")
         (self.Plotlinewidth,
          self.MinorGridlinewidth,
          self.MajorGridlinewidth,
@@ -322,14 +328,19 @@ class DataClass_Spectra:
          self.InsetLineJoin ,
          self.YInsetAxisTickLabelsOption ,
          self.YInsetAxisExponentialOption,
-         self.Y_insetaxis_Label_Pad )= pickle.load(open(File, "rb"))
+         self.Y_insetaxis_Label_Pad )= pickle.load(F)
+        F.close()
         
     def save_Spectra_prefs(self):
         """Save spectra specific plot preferences"""
         print("Saving Spectra specific preferences...")
         File = self.Directory+"\Spectra_prefs.pickle"
+        
+        self.Series_sorted_test = []
+        F = open(File, "wb")
         pickle.dump([self.Series_Label,
                      self.Series_order ,
+                     self.Series_sorted_test,
                      self.Series_Colour,
                      self.Series_LineSty,
                      self.Series_Label_X,
@@ -340,7 +351,8 @@ class DataClass_Spectra:
                      self.Series_LowerBoundX ,
                      self.Series_UpperBoundXOriginal ,
                      self.IncludeSelectedSpectrum,
-                     self.Series_InsetShow  ], open(File, "wb"))
+                     self.Series_InsetShow  ], F)
+        F.close()
 
         print("Spectra specific preferences saved.")
                 
@@ -348,8 +360,11 @@ class DataClass_Spectra:
         """Load spectra specific plot preferneces"""
         print("Loading preferences...")
         File = self.Directory+"\Spectra_prefs.pickle"
+
+        F = open(File, "rb")
         (self.Series_Label,
          self.Series_order ,
+         self.Series_sorted_test,
          self.Series_Colour,
          self.Series_LineSty,
          self.Series_Label_X,
@@ -360,7 +375,8 @@ class DataClass_Spectra:
          self.Series_LowerBoundX ,
          self.Series_UpperBoundXOriginal ,
          self.IncludeSelectedSpectrum,
-         self.Series_InsetShow)= pickle.load(open(File, "rb"))
+         self.Series_InsetShow)= pickle.load(F)
+        F.close()
 
     def Delete_General_Prefs(self):
         """Delete general plot preferences file"""
@@ -392,17 +408,19 @@ class DataClass_Spectra:
     
     def Sort_Arrays_PostPickleLoad(self):
         """Sort the spectra according to loaded sort order"""
-
-        if self.SeriesResorted_Order != self.Series_order:
-            
+        
+        if self.SeriesResorted_Order != self.Series_order and self.Series_sorted_test != self.Series_order:
+            self.Series_sorted_test = self.Series_order;
             for i in range(0, 7):
+                
                 if len(self.__dict__[PickleResortDataDICT(i)])!=0:
-                    print(PickleResortDataDICT(i))
+                    
                     Temp_Sorted_Data = [self.__dict__[PickleResortDataDICT(i)][j] for j in self.Series_order]
                     
                     Temp_SortedSortOrder = [x for _, x in sorted(zip(self.Series_order,self.SeriesResorted_Order))]
                     self.SeriesResorted_Order = Temp_SortedSortOrder
                     self.__dict__[PickleResortDataDICT(i)] = Temp_Sorted_Data
+        
 
     def ChangeInsetSize_Pos(self, Dimension, Value):
         """Change inset size and position"""
@@ -421,12 +439,16 @@ class DataClass_Spectra:
         self.Series_order = list(range(0,self.NumOfSpectra))
         
         i=1
+
+
         
         if len(self.Data) == 0:
+
             self.SeriesResorted_Order = self.Series_order
         
         for file in glob.glob("*.txt"):
             Data=np.genfromtxt(file); # , delimiter = '\t'
+            
             self.Data.append(Data)
             self.Raman_Shift.append(Data[:,][:,0])
             self.Raman_Intensity.append(Data[:,][:,1])
@@ -443,7 +465,7 @@ class DataClass_Spectra:
             self.Series_LowerBoundX.append(0.0)
             self.IncludeSelectedSpectrum.append(True)
             self.Series_InsetShow.append(True)
-            
+        
         self.Series_UpperBoundXOriginal = self.Series_UpperBoundX
         self.RShift_inset_Max = ((FindMax(self.Raman_Shift) - 
                                  FindMin(self.Raman_Shift))*0.6+
@@ -452,15 +474,22 @@ class DataClass_Spectra:
                                  FindMin(self.Raman_Shift))*0.4+
                                     FindMin(self.Raman_Shift))
         
+        Series_Label_check = self.Series_Label;
         self.CheckandLoad_General_Prefs()
         self.CheckandLoad_Spectra_Prefs()
         self.Sort_Arrays_PostPickleLoad()
-
-
+        if len(self.Series_Label) != len(Series_Label_check):
+            print('additional data added to folder, resetting pref files')
+            self.Delete_Spectra_Prefs()
+            self.Delete_General_Prefs()
+            self.reset()
+            self.Import_Data(Text_Data_Directory)
+            
+            
     def Plot_Spectra(self, Y_Variable):
         """Plot standard spectra plot"""
-        plt.rcParams.update({'font.size': self.PlotTextSize})  
-        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
+        self.Set_Plot_Global_Params()
+        
         self.fig , ax = plt.subplots(figsize = (self.FigWidth,self.FigHeight), dpi = 300)
 
         for i in range(self.NumOfSpectra):
@@ -483,8 +512,8 @@ class DataClass_Spectra:
 
     def Plot_OFFSET_Spectra(self, Y_Variable):
         """Plot spectra offset from one another"""
-        plt.rcParams.update({'font.size': self.PlotTextSize})  
-        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
+        self.Set_Plot_Global_Params()
+        
         self.fig , ax = plt.subplots(figsize = (self.FigWidth,self.FigHeight), dpi = 300)
         Offset =  0.0;
         
@@ -507,8 +536,8 @@ class DataClass_Spectra:
 
     def SUB_Plot_Spectra(self, Y_Variable):
         """Plot spectra in a multi sub plot"""
-        plt.rcParams.update({'font.size': self.PlotTextSize})  
-        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
+        self.Set_Plot_Global_Params()
+
         NumOfSpectra = sum(self.IncludeSelectedSpectrum)
         self.fig, ax = plt.subplots(nrows=NumOfSpectra, ncols=1,
                                     figsize = (self.FigWidth,self.FigHeight), dpi = 300)
@@ -552,6 +581,16 @@ class DataClass_Spectra:
         
         plt.show()
 
+    def Set_Plot_Global_Params(self):
+        plt.rcParams.update({'font.size': self.PlotTextSize})  
+        plt.rcParams['axes.linewidth'] = self.MajorGridlinewidth
+                # set tick width
+        
+        plt.rcParams['xtick.major.width'] = self.MajorGridlinewidth
+        plt.rcParams['xtick.minor.width'] = self.MinorGridlinewidth
+        plt.rcParams['ytick.major.width'] = self.MajorGridlinewidth
+        plt.rcParams['ytick.minor.width'] = self.MinorGridlinewidth        
+        
     def Insert_Inset_Plot(self, ax, Y_Variable):
         """Add inset plot"""
         ax_inset = self.SetupInset(ax)
@@ -695,7 +734,7 @@ class DataClass_Spectra:
                      self.Series_Label[i], 
                      fontsize=self.LabelsFontSize)
             
-        Offset = max(self.__dict__[Y_Variable][i]) + Offset
+        Offset = max(self.__dict__[Y_Variable][i])*1.2 + Offset
         return Offset
 
     def Apply_TickLabelOptions(self, ax):
@@ -704,6 +743,8 @@ class DataClass_Spectra:
         xlim  = ax.get_xticks()
         self.X_Axis_LowLim_Override = xlim[0]
         self.X_Axis_HiLim_Override = xlim[-1]
+        
+
         
         if self.MajorXgridlinesOption:
             grid_Colour = FuncInsetLineColour( self.MajorGridColour)

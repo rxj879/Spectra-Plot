@@ -82,13 +82,13 @@ class MainFrame(gui.MainFrame, export_gui.ExportFrame, gplot_gui.GenPlotOptions,
     def OnButtonClick_RestoreDefaultSpecPrefs(self, event):
         """Restore spectra specific pickle file with default parameters"""
         self.FullSpectrumGroup.Delete_Spectra_Prefs()
-        self.FullSpectrumGroup = DataClass_Spectra()
+        self.FullSpectrumGroup.reset()
         self.OnButtonClick_Import_Spectra_Data(event)
         
     def OnButtonClick_RestoreDefaultGenPrefs(self, event):
         """Restore general plot options pickel file with default parameters"""
         self.FullSpectrumGroup.Delete_General_Prefs()
-        self.FullSpectrumGroup = DataClass_Spectra()
+        self.FullSpectrumGroup.reset()
         self.OnButtonClick_Import_Spectra_Data(  event )
 
     def OnButtonClick_SavePrefs(self, event):
@@ -106,20 +106,24 @@ class MainFrame(gui.MainFrame, export_gui.ExportFrame, gplot_gui.GenPlotOptions,
     def OnButtonClick_Import_Spectra_Data( self, event ):
         """Import the data from the selected directory"""
         Text_Data_Directory = self.m_textCtrl_DIR.GetValue()
+        
         self.FullSpectrumGroup.Import_Data(Text_Data_Directory)
+        self.m_radioBox_Norm.SetSelection(self.FullSpectrumGroup.Norm_RadioBoxOption)
+        self.m_radioBox_Plot.SetSelection(self.FullSpectrumGroup.Plot_RadioBoxOption)
         self.OnRadioBox_NormChoices( event )
         self.PopulateListSpectra()
         self.m_ListCtrl_Spectra.Select(0)
         self.CheckandPopulateAllWindows()
-
+        
+        
     def OnRadioBox_NormChoices( self, event ):
         """Take the selected normalisation choice and proceed to crop data for the plot"""
         if self.FullSpectrumGroup == None:
             self.OnButtonClick_select_directory(event)
             
         else:
-            Norm_RadioBoxOption = self.m_radioBox_Norm.GetSelection()
-            self.Y_Variable = Radio2NormOption_Y_Variable(Norm_RadioBoxOption)
+            self.FullSpectrumGroup.Norm_RadioBoxOption = self.m_radioBox_Norm.GetSelection()
+            self.Y_Variable = Radio2NormOption_Y_Variable(self.FullSpectrumGroup.Norm_RadioBoxOption)
             self.CropXData( event )
 
     def CropXData(self, event):
@@ -134,6 +138,7 @@ class MainFrame(gui.MainFrame, export_gui.ExportFrame, gplot_gui.GenPlotOptions,
             self.OnButtonClick_select_directory(event)
             
         else:
+            self.FullSpectrumGroup.Plot_RadioBoxOption = self.m_radioBox_Plot.GetSelection()
             if self.m_radioBox_Plot.GetSelection() == 0:
                 self.FullSpectrumGroup.Plot_Spectra(self.Y_Variable)
 

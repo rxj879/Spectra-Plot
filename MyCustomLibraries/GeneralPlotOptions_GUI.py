@@ -50,6 +50,8 @@ class GenPlotOptions ( wx.Frame ):
         bSizer22 = wx.BoxSizer( wx.VERTICAL )
         bSizer23 = wx.BoxSizer( wx.VERTICAL )
         bSizer24 = wx.BoxSizer( wx.VERTICAL )
+        bSizer25 = wx.BoxSizer( wx.VERTICAL )
+        bSizer26 = wx.BoxSizer( wx.VERTICAL )
         gSizer20 = wx.GridSizer( 0, 6, 0, 0 )
         
         bSizer30 = wx.BoxSizer( wx.VERTICAL )
@@ -140,14 +142,14 @@ class GenPlotOptions ( wx.Frame ):
                        
         self.m_SpinCtrl_FigWidth = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
                                                      size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
-                                                     min=1, max=50, initial=2.5, inc=1, name="Figure Width")
+                                                     min=0.1, max=50, initial=2.5, inc=1, name="Figure Width")
 
         self.m_staticText_FigHeight = wx.StaticText( self, wx.ID_ANY, u"Figure Height", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_FigHeight.Wrap( -1 )
                        
         self.m_SpinCtrl_FigHeight = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
                                                      size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
-                                                     min=1, max=50, initial=1.8, inc=1, name="Height")
+                                                     min=0.1, max=50, initial=1.8, inc=1, name="Height")
         
         """Add widgets to the box and grid definitions"""
         bSizer11.Add( self.m_CHKBox_LegendFrameOption, 1, wx.EXPAND,5 )
@@ -186,57 +188,80 @@ class GenPlotOptions ( wx.Frame ):
         self.m_staticText_X_Axis_LowLim.Wrap( -1 )
                        
         self.m_SpinCtrl_X_Axis_LowLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                                     size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
                                                      min=-100000, max=100000, initial=0, inc=100, name="x axis lower limit")
 
         self.m_staticText_X_Axis_HiLim = wx.StaticText( self, wx.ID_ANY, u"x high limit", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_X_Axis_HiLim.Wrap( -1 )
                        
         self.m_SpinCtrl_X_Axis_HiLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                                     size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
                                                      min=-100000, max=100000, initial=0, inc=100, name="x axis higher limit")
         
-        self.m_staticText_Num_X_Ticks = wx.StaticText( self, wx.ID_ANY, u"Number of x ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_Num_X_Ticks = wx.StaticText( self, wx.ID_ANY, u"Numbx ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Num_X_Ticks.Wrap( -1 )
                        
         self.m_SpinCtrl_Num_X_Ticks = wx.SpinCtrl(self, wx.ID_ANY, "", wx.DefaultPosition,
-                                     (100,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
+                                     (80,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
                                      min=1, max=50, initial=18,  name="Num x ticks")
         
-        self.m_staticText_Num_X_MinorTicks = wx.StaticText( self, wx.ID_ANY, u"Number of minor x ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_Num_X_MinorTicks = wx.StaticText( self, wx.ID_ANY, u"Num minor x ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Num_X_MinorTicks.Wrap( -1 )
                        
         self.m_SpinCtrl_Num_X_MinorTicks = wx.SpinCtrl(self, wx.ID_ANY, "", wx.DefaultPosition,
-                                     (100,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
-                                     min=1, max=50, initial=18,  name="Number of minor x ticks")
+                                     (80,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
+                                     min=1, max=50, initial=18,  name="Num minor x ticks")
 
         self.m_staticText_Y_Axis_LowLim = wx.StaticText( self, wx.ID_ANY, u"y low limit", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Y_Axis_LowLim.Wrap( -1 )
                        
         self.m_SpinCtrl_Y_Axis_LowLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                                     size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
-                                                     min=-100000, max=1E30, initial=0, inc=100, name="y axis lower limit")
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT ,
+                                                     min=-1E30, max=1E30, initial=0, inc=100, name="y axis lower limit")
 
         self.m_staticText_Y_Axis_HiLim = wx.StaticText( self, wx.ID_ANY, u"y high limit", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Y_Axis_HiLim.Wrap( -1 )
                        
         self.m_SpinCtrl_Y_Axis_HiLim = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
-                                                     size=(100,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
-                                                     min=-100000, max=1E30, initial=0, inc=100, name="y axis higher limit")
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
+                                                     min=-1E30, max=1E30, initial=0, inc=100, name="y axis higher limit")
 
-        self.m_staticText_Num_Y_Ticks = wx.StaticText( self, wx.ID_ANY, u"Number of y ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_Num_Y_Ticks = wx.StaticText( self, wx.ID_ANY, u"Num y ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Num_Y_Ticks.Wrap( -1 )
                        
         self.m_SpinCtrl_Num_Y_Ticks = wx.SpinCtrl(self, wx.ID_ANY, "", wx.DefaultPosition,
-                                     (100,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
+                                     (80,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
                                      min=1, max=50, initial=18,  name="Num y ticks")
         
-        self.m_staticText_Num_Y_MinorTicks = wx.StaticText( self, wx.ID_ANY, u"Number of minor y ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_Num_Y_MinorTicks = wx.StaticText( self, wx.ID_ANY, u"Num minor y ticks", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText_Num_Y_MinorTicks.Wrap( -1 )
                        
         self.m_SpinCtrl_Num_Y_MinorTicks = wx.SpinCtrl(self, wx.ID_ANY, "", wx.DefaultPosition,
-                                     (100,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
-                                     min=1, max=50, initial=18,  name="Number of minor y ticks")
+                                     (80,-1), wx.SP_ARROW_KEYS | wx.ALIGN_LEFT | wx.TE_PROCESS_ENTER, 
+                                     min=1, max=50, initial=18,  name="Num minor y ticks")
+        
+        self.m_staticText_MinorGridlinewidth = wx.StaticText( self, wx.ID_ANY, u"Minor Grid width", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_MinorGridlinewidth.Wrap( -1 )
+                       
+        self.m_SpinCtrl_MinorGridlinewidth = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
+                                                     min=0.01, max=100, initial=0.4, inc=0.1, name="MinorGridlinewidth")
+
+        self.m_staticText_MajorGridlinewidth = wx.StaticText( self, wx.ID_ANY, u"Major Grid width", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_MajorGridlinewidth.Wrap( -1 )
+                       
+        self.m_SpinCtrl_MajorGridlinewidth = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
+                                                     min=0.01, max=100, initial=0.3, inc=0.1, name="MajorGridlinewidth")
+
+
+
+        self.m_staticText_Plotlinewidth = wx.StaticText( self, wx.ID_ANY, u"spectra line width", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText_Plotlinewidth.Wrap( -1 )
+                       
+        self.m_SpinCtrl_Plotlinewidth = wx.SpinCtrlDouble(self, id=wx.ID_ANY, value="", pos=wx.DefaultPosition,
+                                                     size=(80,-1), style=wx.SP_ARROW_KEYS| wx.ALIGN_LEFT,
+                                                     min=0.01, max=100, initial=0.5, inc=0.1, name="Plotlinewidth")
 
         """Add widgets to the box and grid definitions"""
         bSizer21.Add(self.m_staticText_X_Axis_LowLim, 1, wx.ALL,5 )
@@ -259,6 +284,15 @@ class GenPlotOptions ( wx.Frame ):
         bSizer24.Add(self.m_staticText_Num_Y_MinorTicks, 1, wx.ALL,5 )
         bSizer24.Add(self.m_SpinCtrl_Num_Y_MinorTicks , 1, wx.ALL,5 )
         gSizer20.Add( bSizer24, 1, wx.ALL,5 )
+        bSizer25.Add( self.m_staticText_MinorGridlinewidth , 1, wx.ALL,5 )
+        bSizer25.Add( self.m_SpinCtrl_MinorGridlinewidth , 1, wx.ALL,5 )
+        bSizer25.Add( self.m_staticText_MajorGridlinewidth , 1, wx.ALL,5 )
+        bSizer25.Add( self.m_SpinCtrl_MajorGridlinewidth , 1, wx.ALL,5 )
+        gSizer20.Add( bSizer25, 1, wx.ALL,5 )
+        bSizer26.Add( self.m_staticText_Plotlinewidth , 1, wx.ALL,5 )
+        bSizer26.Add( self.m_SpinCtrl_Plotlinewidth , 1, wx.ALL,5 )
+        gSizer20.Add( bSizer26, 1, wx.ALL,5 )
+        
         bSizer20.Add(gSizer20, 1, wx.ALL, 5 )
 
         bSizer1.Add(bSizer20, 1, wx.ALL, 5 )     
@@ -392,7 +426,10 @@ class GenPlotOptions ( wx.Frame ):
         self.m_SpinCtrl_Num_Y_Ticks.Bind( wx.EVT_TEXT_ENTER, self.OnSpinCtrl_Num_Y_Ticks )
         self.m_SpinCtrl_Num_Y_MinorTicks.Bind( wx.EVT_SPINCTRL, self.OnSpinCtrl_Num_Y_MinorTicks )
         self.m_SpinCtrl_Num_Y_MinorTicks.Bind( wx.EVT_SPINCTRL, self.OnSpinCtrl_Num_Y_MinorTicks )
-        
+        self.m_SpinCtrl_MinorGridlinewidth.Bind( wx.EVT_SPINCTRLDOUBLE, self.OnSpinCtrl_MinorGridlinewidth)
+        self.m_SpinCtrl_MajorGridlinewidth.Bind( wx.EVT_SPINCTRLDOUBLE, self.OnSpinCtrl_MajorGridlinewidth)
+        self.m_SpinCtrl_Plotlinewidth.Bind( wx.EVT_SPINCTRLDOUBLE, self.OnSpinCtrl_Plotlinewidth)
+
         self.m_SpinCtrl_PlotTextSize.Bind( wx.EVT_SPINCTRL, self.OnSpinCtrl_PlotTextSize )
         self.m_SpinCtrl_PlotTextSize.Bind(wx.EVT_TEXT_ENTER, self.OnSpinCtrl_PlotTextSize )
         self.m_SpinCtrl_LabelsFontSize.Bind( wx.EVT_SPINCTRL, self.OnSpinCtrl_LabelsFontSize )
@@ -524,3 +561,13 @@ class GenPlotOptions ( wx.Frame ):
         
     def OnSpinCtrl_Y_axis_Title_Pad(self, event):
         event.Skip()
+        
+    def OnSpinCtrl_Plotlinewidth(self, event):
+        event.Skip()
+        
+    def OnSpinCtrl_MajorGridlinewidth(self, event):
+        event.Skip()
+
+    def OnSpinCtrl_MinorGridlinewidth(self, event):
+        event.Skip()        
+        
